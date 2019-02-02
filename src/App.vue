@@ -54,7 +54,7 @@
                 ></v-select>
               </v-layout>
               <v-layout>
-                <v-text-field
+                <v-text-field ref="input_column_name"
                   class="pr-2"
                   label="Column Name"
                   type="text"
@@ -164,6 +164,7 @@ export default {
       this.fillable += "'" + this.inputFields[this.inputFields.length - 1]['name'] + "'];";
       this.inputName = "";
       this.selectType = "";
+      this.$nextTick(() => {this.$refs['input_column_name'].focus()})
     },
     generateCreateMethod: function() {
       let result = "";
