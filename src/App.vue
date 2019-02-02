@@ -431,7 +431,7 @@ export default {
       let result = "";
       const sName =
         this.modelName.charAt(0).toLowerCase() + this.modelName.slice(1);
-      result += "\tprivate $"+sName+"Service;\n";
+      result += "private $"+sName+"Service;\n";
       result += "\n";
       result += this.generateTestSetupCode();
       result += "\n";
