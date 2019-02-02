@@ -288,10 +288,12 @@ export default {
       return result;
     },
     generateTestSetupCode: function() {
+      const sName =
+        this.modelName.charAt(0).toLowerCase() + this.modelName.slice(1);
       let result = "public function setUp()\n";
       result += "{\n";
-      result += "\t"+"$this->DummyService = new \App\Services\DummyService();"+"\n".replace('Dummy', this.modelName)
-      result += "\tparent::setUp();";
+      result += "\t"+"$this->" + sName + "Service = new \\App\\Services\\" + this.modelName + "Service();"+"\n";
+      result += "\tparent::setUp();\n";
       result += "}\n";
       return result
     },
@@ -427,6 +429,10 @@ export default {
         return error;
       }
       let result = "";
+      const sName =
+        this.modelName.charAt(0).toLowerCase() + this.modelName.slice(1);
+      result += "\tprivate $"+sName+"Service;\n";
+      result += "\n";
       result += this.generateTestSetupCode();
       result += "\n";
       result += this.generateCreateTest();
