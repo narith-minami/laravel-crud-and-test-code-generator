@@ -85,6 +85,8 @@
             ></v-textarea>
             <p>Note:</p>
             <p>1. You need to add "use \App\{{ modelName }};" on Your Class</p>
+            <p>2. You need to add $fillabel to {{ modelName }}.php</p>
+            <p> -「{{ fillable }}」</p>
             <v-textarea
               box
               auto-grow
@@ -137,6 +139,7 @@ export default {
     updateKeyName: "",
     selectKeyName: "",
     inputFields: [],
+    fillable: "",
     dummy: [
       { name: "title", type: "integer" },
       { name: "body", type: "string" }
@@ -154,6 +157,11 @@ export default {
       }
       const data = { name: this.inputName, type: this.selectType };
       this.inputFields.push(data);
+      this.fillable = "protected $fillable = [";
+      for (let i = 0; i < this.inputFields.length - 1; ++i) {
+        this.fillable += "'" + this.inputFields[i] + "', ";
+      }
+      this.fillable += "'" + this.inputFields[this.inputFields.length - 1] + "'];";
       this.inputName = "";
       this.selectType = "";
     },
