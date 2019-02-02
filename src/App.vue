@@ -159,9 +159,9 @@ export default {
       this.inputFields.push(data);
       this.fillable = "protected $fillable = [";
       for (let i = 0; i < this.inputFields.length - 1; ++i) {
-        this.fillable += "'" + this.inputFields[i] + "', ";
+        this.fillable += "'" + this.inputFields[i]['name'] + "', ";
       }
-      this.fillable += "'" + this.inputFields[this.inputFields.length - 1] + "'];";
+      this.fillable += "'" + this.inputFields[this.inputFields.length - 1]['name'] + "'];";
       this.inputName = "";
       this.selectType = "";
     },
