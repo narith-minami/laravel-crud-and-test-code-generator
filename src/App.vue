@@ -293,6 +293,7 @@ export default {
       result += "\t"+"$this->DummyService = new \App\Services\DummyService();"+"\n".replace('Dummy', this.modelName)
       result += "\tparent::setUp();";
       result += "}\n";
+      return result
     },
     generateUpdateTest: function() {
       let result = "";
