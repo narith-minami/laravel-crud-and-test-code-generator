@@ -287,6 +287,13 @@ export default {
       }
       return result;
     },
+    generateTestSetupCode: function() {
+      let result = "public function setUp()\n";
+      result += "{\n";
+      result += "\t"+"$this->DummyService = new \App\Services\DummyService();"+"\n".replace('Dummy', this.modelName)
+      result += "\tparent::setUp();";
+      result += "}\n";
+    },
     generateUpdateTest: function() {
       let result = "";
       let args = "$" + this.updateKeyName + ", ";
@@ -419,6 +426,8 @@ export default {
         return error;
       }
       let result = "";
+      result += this.generateTestSetupCode();
+      result += "\n";
       result += this.generateCreateTest();
       result += "\n";
       result += this.generateGetTest();
