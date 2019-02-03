@@ -54,7 +54,8 @@
                 ></v-select>
               </v-layout>
               <v-layout>
-                <v-text-field ref="input_column_name"
+                <v-text-field
+                  ref="input_column_name"
                   class="pr-2"
                   label="Column Name"
                   type="text"
@@ -70,6 +71,17 @@
                   >add</v-btn
                 >
               </v-layout>
+
+              <v-textarea
+                box
+                auto-grow
+                name="input-7-4"
+                label="Migration Fileds"
+                v-model="textInput"
+              ></v-textarea>
+              <v-btn outlline round class="blue" @click="addColumnsFromText();"
+                >Check</v-btn
+              >
             </v-form>
           </v-content>
         </v-flex>
@@ -86,7 +98,7 @@
             <p>Note:</p>
             <p>1. You need to add "use \App\{{ modelName }};" on Your Class</p>
             <p>2. You need to add $fillabel to {{ modelName }}.php</p>
-            <p> -「{{ fillable }}」</p>
+            <p>-「{{ fillable }}」</p>
             <v-textarea
               box
               auto-grow
@@ -135,10 +147,20 @@ export default {
     inputName: "",
     selectType: "",
     modelName: "",
-    items: ["integer", "string", "timestamp"],
+    items: [
+      "integer",
+      "double",
+      "boolean",
+      "string",
+      "text",
+      "date",
+      "dateTime",
+      "timestamp"
+    ],
     updateKeyName: "",
     selectKeyName: "",
     inputFields: [],
+    textInput: "",
     fillable: "",
     dummy: [
       { name: "title", type: "integer" },
@@ -146,6 +168,28 @@ export default {
     ]
   }),
   methods: {
+    addColumnsFromText: function() {
+      if (this.textInput === "") {
+        return;
+      }
+      let migrationFields = this.textInput.replace(/\r\n|\r/g, "\n");
+      var lines = migrationFields.split("\n");
+      for (var i = 0; i < lines.length; i++) {
+        const str = lines[i];
+        if (str == "") {
+          continue;
+        }
+        let type = str.split(">")[1].split("(")[0];
+        let column = str.split("'")[1];
+        if (!type || !column) {
+          continue;
+        }
+        if (!(column === "id" && type === "increments")) {
+          const data = { name: column, type: type };
+          this.inputFields.push(data);
+        }
+      }
+    },
     addColumn: function() {
       if (this.inputName === "") {
         alert("Please input column name.");
@@ -159,12 +203,15 @@ export default {
       this.inputFields.push(data);
       this.fillable = "protected $fillable = [";
       for (let i = 0; i < this.inputFields.length - 1; ++i) {
-        this.fillable += "'" + this.inputFields[i]['name'] + "', ";
+        this.fillable += "'" + this.inputFields[i]["name"] + "', ";
       }
-      this.fillable += "'" + this.inputFields[this.inputFields.length - 1]['name'] + "'];";
+      this.fillable +=
+        "'" + this.inputFields[this.inputFields.length - 1]["name"] + "'];";
       this.inputName = "";
       this.selectType = "";
-      this.$nextTick(() => {this.$refs['input_column_name'].focus()})
+      this.$nextTick(() => {
+        this.$refs["input_column_name"].focus();
+      });
     },
     generateCreateMethod: function() {
       let result = "";
@@ -264,12 +311,22 @@ export default {
         if (type === "integer") {
           const value = addText ? 100 + i : 10 + i;
           inputParamCode += "\t$" + columnName + " = " + value + ";\n";
-        } else if (type === "string") {
+        } else if (type === "double") {
+          const value = addText ? 100.123 + i : 10.123 + i;
+          inputParamCode += "\t$" + columnName + " = " + value + ";\n";
+        } else if (type === "string" || type === "text") {
           const value = addText ? columnName + addText : columnName;
           inputParamCode +=
             "\t$" + columnName + " = 'This is " + value + "';\n";
-        } else if (type === "timestamp") {
+        } else if (
+          type === "date" ||
+          type === "dateTime" ||
+          type === "timestamp"
+        ) {
           inputParamCode += "\t$" + columnName + " = Carbon::now();\n";
+        } else if (type === "boolean") {
+          const value = addText ? false : true;
+          inputParamCode += "\t$" + columnName + " = " + value + ";\n";
         }
       }
       return inputParamCode;
@@ -293,10 +350,17 @@ export default {
         this.modelName.charAt(0).toLowerCase() + this.modelName.slice(1);
       let result = "public function setUp()\n";
       result += "{\n";
-      result += "\t"+"$this->" + sName + "Service = new \\App\\Services\\" + this.modelName + "Service();"+"\n";
+      result +=
+        "\t" +
+        "$this->" +
+        sName +
+        "Service = new \\App\\Services\\" +
+        this.modelName +
+        "Service();" +
+        "\n";
       result += "\tparent::setUp();\n";
       result += "}\n";
-      return result
+      return result;
     },
     generateUpdateTest: function() {
       let result = "";
@@ -432,7 +496,7 @@ export default {
       let result = "";
       const sName =
         this.modelName.charAt(0).toLowerCase() + this.modelName.slice(1);
-      result += "private $"+sName+"Service;\n";
+      result += "private $" + sName + "Service;\n";
       result += "\n";
       result += this.generateTestSetupCode();
       result += "\n";
