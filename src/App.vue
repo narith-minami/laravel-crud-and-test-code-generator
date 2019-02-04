@@ -345,13 +345,13 @@ export default {
 
         if (type === "integer") {
           const value = addText ? 100 + i : 10 + i;
-          inputParamCode += value;
+          inputParamCode += value + index;
         } else if (type === "double") {
           const value = addText ? 100.123 + i : 10.123 + i;
           inputParamCode += value;
         } else if (type === "string" || type === "text") {
           const value = addText ? columnName + addText : columnName;
-          inputParamCode += "'This is " + value;
+          inputParamCode += "'This is " + value + index;
         } else if ( type === "date" || type === "dateTime" || type === "timestamp") {
           inputParamCode += "Carbon::now();\n";
         } else if (type === "boolean") {
