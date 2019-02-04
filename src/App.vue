@@ -31,6 +31,13 @@
                 :success="selectKeyName !== ''"
                 v-model="selectKeyName"
               ></v-text-field>
+              <v-container fluid>
+                <p>{{ radios || 'null' }}</p>
+                <v-radio-group v-model="radios" :mandatory="false">
+                  <v-radio label="Single Record (1:1)" value="single"></v-radio>
+                  <v-radio label="Multi Records (1:n)" value="multi"></v-radio>
+                </v-radio-group>
+              </v-container>
               <v-layout
                 v-if="0 < inputFields.length"
                 v-for="(field, index) in inputFields"
@@ -159,6 +166,7 @@ export default {
     ],
     updateKeyName: "",
     selectKeyName: "",
+    radios: "single",
     inputFields: [],
     textInput: "",
     fillable: "",
@@ -217,22 +225,30 @@ export default {
       let result = "";
       let args = "";
       const data = this.inputFields;
+      if (this.radios === 'multi') {
+        result += "public function create" + this.modelName + "s($" + data[0]["name"] + ", $params)" + "\n";
+        result += "{" + "\n";
+        result += "\tforeach ($params as $key => $value) {\n";
+        result += "\t\t$model = new " + this.modelName + "();" + "\n";
+        result += "\t\t$model->" + data[0]["name"] + " = $" + data[i]["name"] + ";" + "\n";
+        for (let i = 1; i < data.length; ++i) {
+          result += "\t\t$model->" + data[i]["name"] + " = value['" + data[i]["name"] + "'];" + "\n";
+        }
+        result += "\t\t$model->save();" + "\n";
+        result += "\t}" + "\n";
+        result += "\treturn true;" + "\n";
+        result += "}" + "\n";
+        return result;
+      }
       for (let i = 0; i < data.length - 1; ++i) {
         args += "$" + data[i]["name"] + ", ";
       }
       args += "$" + data[data.length - 1]["name"];
-      result +=
-        "public function create" + this.modelName + "(" + args + ")" + "\n";
+      result += "public function create" + this.modelName + "(" + args + ")" + "\n";
       result += "{" + "\n";
       result += "\t$model = new " + this.modelName + "();" + "\n";
       for (let i = 0; i < data.length; ++i) {
-        result +=
-          "\t$model->" +
-          data[i]["name"] +
-          " = $" +
-          data[i]["name"] +
-          ";" +
-          "\n";
+        result += "\t$model->" + data[i]["name"] + " = $" + data[i]["name"] + ";" + "\n";
       }
       result += "\t$model->save();" + "\n";
       result += "}" + "\n";
@@ -242,6 +258,25 @@ export default {
       let result = "";
       let args = "$" + this.updateKeyName + ", ";
       const data = this.inputFields;
+      if (this.radios === 'multi') {
+        result += "public function update" + this.modelName + "s($" + data[0]["name"] + ", $params)" + "\n";
+        result += "{" + "\n";
+        result += "\tforeach ($params as $key => $value) {\n";
+        result += "\t\t" + this.modelName + "::updateOrCreate(" + "\n";
+        result += "\t\t\t" + "['" + this.updateKeyName + "' => $" + this.updateKeyName + "]," + "\n";
+        result += "\t\t\t" + "[";
+        for (let i = 0; i < data.length - 1; ++i) {
+          const column = data[i]["name"];
+          result += "'" + column + "' => $" + column + ", ";
+        }
+        const lastColumn = data[data.length - 1]["name"];
+        result += "'" + lastColumn + "' => $" + lastColumn + "]);" + "\n";
+        result += "\t}" + "\n";
+        result += "\treturn true;" + "\n";
+        result += "}" + "\n";
+        return result;
+      }
+
       for (let i = 0; i < data.length - 1; ++i) {
         args += "$" + data[i]["name"] + ", ";
       }
@@ -249,55 +284,84 @@ export default {
       result +=
         "public function update" + this.modelName + "(" + args + ")" + "\n";
       result += "{" + "\n";
-      result +=
-        "\t" + "$model = " + this.modelName + "::updateOrCreate(" + "\n";
-      result +=
-        "\t" +
-        "\t" +
-        "['" +
-        this.updateKeyName +
-        "' => $" +
-        this.updateKeyName +
-        "]," +
-        "\n";
+      result += "\t" + "$model = " + this.modelName + "::updateOrCreate(" + "\n";
+      result += "\t" + "\t" + "['" + this.updateKeyName + "' => $" + this.updateKeyName + "]," + "\n";
       result += "\t" + "\t" + "[";
       for (let i = 0; i < data.length - 1; ++i) {
-        result += "'" + data[i]["name"] + "' => $" + data[i]["name"] + ", ";
+        const column = data[i]["name"];
+        result += "'" + column + "' => $" + column + ", ";
       }
-      result +=
-        "'" +
-        data[data.length - 1]["name"] +
-        "' => $" +
-        data[data.length - 1]["name"] +
-        "]);" +
-        "\n";
+      const lastColumn = data[data.length - 1]["name"];
+      result += "'" + lastColumn + "' => $" + lastColumn + "]);" + "\n";
       result += "\t" + "return $model;" + "\n";
       result += "}" + "\n";
       return result;
     },
     generateGetMethod: function() {
       let result = "";
-      result +=
-        "public function get" +
-        this.modelName +
-        "($" +
-        this.selectKeyName +
-        ")" +
-        "\n";
+      if (this.radios === 'multi') {
+        result += "public function get" + this.modelName + "s($" + this.selectKeyName + ")\n";
+        result += "{" + "\n";
+        result += "\t$models = " + this.modelName + "::where('" + this.selectKeyName + "', $" + this.selectKeyName + ")->get();\n";
+        result += "\t" + "return $models;" + "\n";
+        result += "}" + "\n";
+        return result;
+      }
+      result += "public function get" + this.modelName + "($" + this.selectKeyName + ")\n";
       result += "{" + "\n";
-      result +=
-        "\t" +
-        "$model = " +
-        this.modelName +
-        "::where('" +
-        this.selectKeyName +
-        "', $" +
-        this.selectKeyName +
-        ")->first();" +
-        "\n";
+      result += "\t$model = " + this.modelName + "::where('" + this.selectKeyName + "', $" + this.selectKeyName + ")->first();\n";
       result += "\t" + "return $model;" + "\n";
       result += "}" + "\n";
       return result;
+    },
+    getTestMultiParameterCode: function(addText) {
+      let inputParamCode = "";
+      const keyColumn = (addText ? this.updateKeyName : this.selectKeyName);
+      if (addText) {
+        inputParamCode += "\t$results = " + this.modelName + "::where('" + keyColumn + "', 99999)->get();\n";
+        inputParamCode += "\t$resultRecord_1 = $results[0];\n";
+        inputParamCode += "\t$resultRecord_2 = $results[1];\n\n";
+      }
+      inputParamCode = "\t$" + keyColumn + " = 9999;\n";
+
+      for (let i = 1; i < 3; i++) {
+        inputParamCode += this.getTestArrayParameterCode(i, addText);
+      }
+      return inputParamCode;
+    },
+    getTestArrayParameterCode: function(index, addText) {
+      let inputParamCode = "";
+
+      if (addText) {
+        inputParamCode += "\t$data"+index+" = ['id'=>$resultRecord_"+index+"->id, ";
+      } else {
+        inputParamCode += "\t$data"+index+" = [";
+      }
+      const data = this.inputFields;
+      for (let i = 0; i < data.length-1; ++i) {
+        const columnName = data[i]["name"];
+        const type = data[i]["type"];
+        inputParamCode += "'"+columnName+"'=>";
+
+        if (type === "integer") {
+          const value = addText ? 100 + i : 10 + i;
+          inputParamCode += value;
+        } else if (type === "double") {
+          const value = addText ? 100.123 + i : 10.123 + i;
+          inputParamCode += value;
+        } else if (type === "string" || type === "text") {
+          const value = addText ? columnName + addText : columnName;
+          inputParamCode += "'This is " + value;
+        } else if ( type === "date" || type === "dateTime" || type === "timestamp") {
+          inputParamCode += "Carbon::now();\n";
+        } else if (type === "boolean") {
+          const value = addText ? false : true;
+          inputParamCode += value;
+        }
+        inputParamCode += ", ";
+      }
+      const column = data[data.length-1]["name"];
+      inputParamCode += "'"+column+"'=>"+value+"];\n";
     },
     getTestParameterCode: function(addText) {
       let inputParamCode =
@@ -330,6 +394,18 @@ export default {
         }
       }
       return inputParamCode;
+    },
+    getTestMultiAssertCode: function() {
+      let result = "\t$this->assertTrue(count($results) === 2);\n";
+      result += "\t$resultRecord_1 = $results[0];\n"
+      result += "\t$resultRecord_2 = $results[1];\n"
+      const data = this.inputFields;
+      for (let i = 0; i < data.length; ++i) {
+        const columnName = data[i]["name"];
+        result += "\t$this->assertSame($resultRecord_1->" + columnName + ", $data1['" + columnName + "']);\n";
+        result += "\t$this->assertSame($resultRecord_2->" + columnName + ", $data2['" + columnName + "']);\n";
+      }
+      return result;
     },
     getTestAssertCode: function() {
       let result = "";
@@ -402,8 +478,21 @@ export default {
     },
     generateCreateTest: function() {
       let result = "";
-      let args = "";
+      let args = "$"+this.selectKeyName+", [$data1,$data2]";
       const data = this.inputFields;
+      if (this.radios === 'multi') {
+        result += "public function testCreate" + this.modelName + "s()" + "\n";
+        result += "{" + "\n";
+        result += this.getTestMultiParameterCode('[change]') + "\n";
+        const sName = this.modelName.charAt(0).toLowerCase() + this.modelName.slice(1);
+        result += "\t$results = $this->" + sName + "Service->create" + this.modelName + "s(" + args + ");\n";
+        result += "\t$models = " + this.modelName + "::where('" + this.selectKeyName + "', $" + this.selectKeyName + ")->first();\n";
+        result += "\n";
+        result += this.getTestMultiAssertCode();
+        result += "}" + "\n";
+        return result;
+      }
+
       for (let i = 0; i < data.length - 1; ++i) {
         const columnName = data[i]["name"];
         args += "$" + columnName + ", ";
@@ -414,25 +503,8 @@ export default {
       result += this.getTestParameterCode() + "\n";
       const sName =
         this.modelName.charAt(0).toLowerCase() + this.modelName.slice(1);
-      result +=
-        "\t$result = $this->" +
-        sName +
-        "Service->create" +
-        this.modelName +
-        "(" +
-        args +
-        ");" +
-        "\n";
-      result +=
-        "\t" +
-        "$model = " +
-        this.modelName +
-        "::where('" +
-        this.selectKeyName +
-        "', $" +
-        this.selectKeyName +
-        ")->first();" +
-        "\n";
+      result += "\t$result = $this->" + sName + "Service->create" + this.modelName + "(" + args + ");\n";
+      result += "\t$model = " + this.modelName + "::where('" + this.selectKeyName + "', $" + this.selectKeyName + ")->first();\n";
       result += "\n";
       result += this.getTestAssertCode();
       result += "}" + "\n";
@@ -441,21 +513,23 @@ export default {
     generateGetTest: function() {
       let result = "";
       let args = "$" + this.selectKeyName;
-      const data = this.inputFields;
+      if (this.radios === 'multi') {
+        result += "public function testGet" + this.modelName + "s()" + "\n";
+        result += "{" + "\n";
+        result += this.getTestMultiParameterCode() + "\n";
+        const sName = this.modelName.charAt(0).toLowerCase() + this.modelName.slice(1);
+        result += "\t$results = $this->" + sName + "Service->get" + this.modelName + "(" + args + ");\n";
+        result += "\n";
+        result += this.getTestMultiAssertCode();
+        result += "}" + "\n";
+        return result;
+      }
+
       result += "public function testGet" + this.modelName + "()" + "\n";
       result += "{" + "\n";
       result += this.getTestParameterCode() + "\n";
-      const sName =
-        this.modelName.charAt(0).toLowerCase() + this.modelName.slice(1);
-      result +=
-        "\t$model = $this->" +
-        sName +
-        "Service->get" +
-        this.modelName +
-        "(" +
-        args +
-        ");" +
-        "\n";
+      const sName = this.modelName.charAt(0).toLowerCase() + this.modelName.slice(1);
+      result += "\t$model = $this->" + sName + "Service->get" + this.modelName + "(" + args + ");\n";
       result += "\n";
       result += this.getTestAssertCode();
       result += "}" + "\n";
