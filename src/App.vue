@@ -226,12 +226,11 @@ export default {
       let args = "";
       const data = this.inputFields;
       if (this.radios === 'multi') {
-        result += "public function create" + this.modelName + "s($" + data[0]["name"] + ", $params)" + "\n";
+        result += "public function create" + this.modelName + "s($params)" + "\n";
         result += "{" + "\n";
         result += "\tforeach ($params as $key => $value) {\n";
         result += "\t\t$model = new " + this.modelName + "();" + "\n";
-        result += "\t\t$model->" + data[0]["name"] + " = $" + data[0]["name"] + ";" + "\n";
-        for (let i = 1; i < data.length; ++i) {
+        for (let i = 0; i < data.length; ++i) {
           const columnName = data[i]["name"];
           result += "\t\t$model->" + columnName + " = value['" + columnName + "'];" + "\n";
         }
@@ -260,7 +259,7 @@ export default {
       let args = "$" + this.updateKeyName + ", ";
       const data = this.inputFields;
       if (this.radios === 'multi') {
-        result += "public function update" + this.modelName + "s($" + data[0]["name"] + ", $params)" + "\n";
+        result += "public function update" + this.modelName + "s($" + this.updateKeyName + ", $params)" + "\n";
         result += "{" + "\n";
         result += "\tforeach ($params as $key => $value) {\n";
         result += "\t\t" + this.modelName + "::updateOrCreate(" + "\n";
@@ -448,7 +447,7 @@ export default {
         const args = "$"+this.updateKeyName+", [$data1,$data2]";
         result += "public function testUpdate" + this.modelName + "s()" + "\n";
         result += "{" + "\n";
-        result += this.getTestMultiParameterCode() + "\n";
+        result += this.getTestMultiParameterCode('[change]') + "\n";
         const sName = this.modelName.charAt(0).toLowerCase() + this.modelName.slice(1);
         result += "\t$this->" + sName + "Service->update" + this.modelName + "s(" + args + ");\n";
         result += "\t$results = " + this.modelName + "::where('" + this.selectKeyName + "', $" + this.selectKeyName + ")->first();\n";
