@@ -450,7 +450,7 @@ export default {
         result += this.getTestMultiParameterCode('[change]') + "\n";
         const sName = this.modelName.charAt(0).toLowerCase() + this.modelName.slice(1);
         result += "\t$this->" + sName + "Service->update" + this.modelName + "s(" + args + ");\n";
-        result += "\t$results = " + this.modelName + "::where('" + this.selectKeyName + "', $" + this.selectKeyName + ")->first();\n";
+        result += "\t$results = " + this.modelName + "::where('" + this.selectKeyName + "', $" + this.selectKeyName + ")->get();\n";
         result += "\n";
         result += this.getTestMultiAssertCode();
         result += "}" + "\n";
@@ -501,7 +501,7 @@ export default {
         result += this.getTestMultiParameterCode() + "\n";
         const sName = this.modelName.charAt(0).toLowerCase() + this.modelName.slice(1);
         result += "\t$this->" + sName + "Service->create" + this.modelName + "s(" + args + ");\n";
-        result += "\t$results = " + this.modelName + "::where('" + this.selectKeyName + "', $" + this.selectKeyName + ")->first();\n";
+        result += "\t$results = " + this.modelName + "::where('" + this.selectKeyName + "', $" + this.selectKeyName + ")->get();\n";
         result += "\n";
         result += this.getTestMultiAssertCode();
         result += "}" + "\n";
