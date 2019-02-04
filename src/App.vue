@@ -230,9 +230,10 @@ export default {
         result += "{" + "\n";
         result += "\tforeach ($params as $key => $value) {\n";
         result += "\t\t$model = new " + this.modelName + "();" + "\n";
-        result += "\t\t$model->" + data[0]["name"] + " = $" + data[i]["name"] + ";" + "\n";
+        result += "\t\t$model->" + data[0]["name"] + " = $" + data[0]["name"] + ";" + "\n";
         for (let i = 1; i < data.length; ++i) {
-          result += "\t\t$model->" + data[i]["name"] + " = value['" + data[i]["name"] + "'];" + "\n";
+          const columnName = data[i]["name"];
+          result += "\t\t$model->" + columnName + " = value['" + columnName + "'];" + "\n";
         }
         result += "\t\t$model->save();" + "\n";
         result += "\t}" + "\n";
@@ -361,7 +362,8 @@ export default {
         inputParamCode += ", ";
       }
       const column = data[data.length-1]["name"];
-      inputParamCode += "'"+column+"'=>"+value+"];\n";
+      inputParamCode += "'"+column+"'=>"+column+"];\n";
+      return inputParamCode;
     },
     getTestParameterCode: function(addText) {
       let inputParamCode =
@@ -440,8 +442,22 @@ export default {
     },
     generateUpdateTest: function() {
       let result = "";
-      let args = "$" + this.updateKeyName + ", ";
+
       const data = this.inputFields;
+      if (this.radios === 'multi') {
+        const args = "$"+this.updateKeyName+", [$data1,$data2]";
+        result += "public function testUpdate" + this.modelName + "s()" + "\n";
+        result += "{" + "\n";
+        result += this.getTestMultiParameterCode() + "\n";
+        const sName = this.modelName.charAt(0).toLowerCase() + this.modelName.slice(1);
+        result += "\t$this->" + sName + "Service->update" + this.modelName + "s(" + args + ");\n";
+        result += "\t$results = " + this.modelName + "::where('" + this.selectKeyName + "', $" + this.selectKeyName + ")->first();\n";
+        result += "\n";
+        result += this.getTestMultiAssertCode();
+        result += "}" + "\n";
+        return result;
+      }
+      let args = "$" + this.updateKeyName + ", ";
       for (let i = 0; i < data.length - 1; ++i) {
         const columnName = data[i]["name"];
         args += "$" + columnName + ", ";
@@ -478,21 +494,21 @@ export default {
     },
     generateCreateTest: function() {
       let result = "";
-      let args = "$"+this.selectKeyName+", [$data1,$data2]";
       const data = this.inputFields;
       if (this.radios === 'multi') {
+        const args = "$"+this.selectKeyName+", [$data1,$data2]";
         result += "public function testCreate" + this.modelName + "s()" + "\n";
         result += "{" + "\n";
-        result += this.getTestMultiParameterCode('[change]') + "\n";
+        result += this.getTestMultiParameterCode() + "\n";
         const sName = this.modelName.charAt(0).toLowerCase() + this.modelName.slice(1);
-        result += "\t$results = $this->" + sName + "Service->create" + this.modelName + "s(" + args + ");\n";
-        result += "\t$models = " + this.modelName + "::where('" + this.selectKeyName + "', $" + this.selectKeyName + ")->first();\n";
+        result += "\t$this->" + sName + "Service->create" + this.modelName + "s(" + args + ");\n";
+        result += "\t$results = " + this.modelName + "::where('" + this.selectKeyName + "', $" + this.selectKeyName + ")->first();\n";
         result += "\n";
         result += this.getTestMultiAssertCode();
         result += "}" + "\n";
         return result;
       }
-
+      let args = "";
       for (let i = 0; i < data.length - 1; ++i) {
         const columnName = data[i]["name"];
         args += "$" + columnName + ", ";
@@ -518,7 +534,7 @@ export default {
         result += "{" + "\n";
         result += this.getTestMultiParameterCode() + "\n";
         const sName = this.modelName.charAt(0).toLowerCase() + this.modelName.slice(1);
-        result += "\t$results = $this->" + sName + "Service->get" + this.modelName + "(" + args + ");\n";
+        result += "\t$results = $this->" + sName + "Service->get" + this.modelName + "s(" + args + ");\n";
         result += "\n";
         result += this.getTestMultiAssertCode();
         result += "}" + "\n";
