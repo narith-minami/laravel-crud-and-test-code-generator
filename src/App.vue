@@ -593,7 +593,7 @@ export default {
         for (var i = 0; i < this.inputFields.length; i++) {
           const column = this.inputFields[i].name;
           const seq = i + 1;
-          result += "\t\t<span>" + seq + ". " + column + " : { data.column_" + seq + " }</span>\n";
+          result += "\t\t<span>" + seq + ". " + column + " : { data." + column + " }</span>\n";
         }
         result += "\t</div>\n";
         result += "</template>\n";
@@ -656,6 +656,7 @@ export default {
       }
       result += "\t\t\t\t}\n"
       result +=          "\t\t\t\tapi.post('/api/{**Your Domain**}', data).then(rs => {\n"
+      result += "\t\t\t\t})\n"
       result +=          "\t\t\t}\n"
       result +=        "\t\t}\n"
       result +=      "\t}\n"
