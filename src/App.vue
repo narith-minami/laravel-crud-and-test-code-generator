@@ -589,6 +589,7 @@ export default {
     },
     generateVueTemplate: function() {
       let result = "<template>\n";
+      result += "<div>\n";
       if (this.radios === 'multi') {
         result += '\t<div v-for="(data, index) in list">\n';
         result += '\t<p>[ Record.{index} ]</p>\n';
@@ -598,6 +599,7 @@ export default {
           result += "\t\t<span>" + seq + ". " + column + " : { data." + column + " }</span>\n";
         }
         result += "\t</div>\n";
+        result += "</div>\n";
         result += "</template>\n";
         return result;
       }
@@ -606,6 +608,7 @@ export default {
         const seq = i + 1;
         result += "\t<span>" + seq + ". " + column + " : { " + column + " }</span>\n";
       }
+      result += "</div>\n";
       result += "</template>\n";
       return result;
     },
