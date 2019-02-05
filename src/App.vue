@@ -197,6 +197,12 @@ export default {
           this.inputFields.push(data);
         }
       }
+      this.fillable = "protected $fillable = [";
+      for (let i = 0; i < this.inputFields.length - 1; ++i) {
+        this.fillable += "'" + this.inputFields[i]["name"] + "', ";
+      }
+      this.fillable +=
+        "'" + this.inputFields[this.inputFields.length - 1]["name"] + "'];";
     },
     addColumn: function() {
       if (this.inputName === "") {
@@ -351,7 +357,7 @@ export default {
           inputParamCode += value;
         } else if (type === "string" || type === "text") {
           const value = addText ? columnName + addText : columnName;
-          inputParamCode += "'This is " + value + index;
+          inputParamCode += "'This is " + value + index + "'";
         } else if ( type === "date" || type === "dateTime" || type === "timestamp") {
           inputParamCode += "Carbon::now();\n";
         } else if (type === "boolean") {
@@ -436,6 +442,15 @@ export default {
         "Service();" +
         "\n";
       result += "\tparent::setUp();\n";
+      result += "}\n";
+      return result;
+    },
+    generateTestTearDownAfterClassCode: function() {
+      const sName =
+        this.modelName.charAt(0).toLowerCase() + this.modelName.slice(1);
+      let result = "public function tearDownAfterClass()\n";
+      result += "{\n";
+      result += "\t" + this.modelName + "::where('" + this.selectKeyName + "', 99999)->delete();\n";
       result += "}\n";
       return result;
     },
@@ -588,6 +603,8 @@ export default {
       result += "private $" + sName + "Service;\n";
       result += "\n";
       result += this.generateTestSetupCode();
+      result += "\n";
+      result += this.generateTestTearDownAfterClassCode();
       result += "\n";
       result += this.generateCreateTest();
       result += "\n";
