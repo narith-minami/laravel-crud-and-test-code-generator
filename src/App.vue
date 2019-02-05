@@ -129,7 +129,7 @@
               3. You need to add field "private ${Your Service Class} on Your
               Test Class"
             </p>
-            <h3>For Vue.js Code (Sample)</h2>
+            <h3>For Vue.js Code (Sample)</h3>
             <p>This is sample front side code for confirm your API.</p>
             <v-textarea
               box
@@ -590,8 +590,8 @@ export default {
       if (this.radios === 'multi') {
         result += '\t<div v-for="(data, index) in list">\n';
         result += '\t<p>[ Record.{index} ]</p>\n';
-        for (var i = 0; i < thi.inputFields.length; i++) {
-          const column = thi.inputFields[i].name;
+        for (var i = 0; i < this.inputFields.length; i++) {
+          const column = this.inputFields[i].name;
           const seq = i + 1;
           result += "\t\t<span>" + seq + ". " + column + " : { data.column_" + seq + " }</span>\n";
         }
@@ -599,8 +599,8 @@ export default {
         result += "</template>\n";
         return result;
       }
-      for (var i = 0; i < thi.inputFields.length; i++) {
-        const column = thi.inputFields[i].name;
+      for (var i = 0; i < this.inputFields.length; i++) {
+        const column = this.inputFields[i].name;
         const seq = i + 1;
         result += "\t<span>" + seq + ". " + column + " : { column_" + seq + " }</span>\n";
       }
@@ -619,7 +619,7 @@ export default {
     },
     generateVueScript: function() {
       const keyName = this.fSnakeToCamel(this.selectKeyName)
-      let result += "<script>\n"
+      let result = "<script>\n"
       result += "\texport default {\n"
       result +=        "\t\tcreated() {\n"
       result +=          "\t\t\tthis.fetch()\n"
@@ -655,11 +655,11 @@ export default {
         result += "\t\t\t\t\t"+column+": this."+this.fSnakeToCamel(column)+ (isLast?"\n":",\n")
       }
       result += "\t\t\t\t}\n"
-      result +=          "\t\t\t\tapi.post('/api/{**Your Domain**}, data).then(rs => {\n"
+      result +=          "\t\t\t\tapi.post('/api/{**Your Domain**}', data).then(rs => {\n"
       result +=          "\t\t\t}\n"
       result +=        "\t\t}\n"
       result +=      "\t}\n"
-      result += "</script>"
+      result += "</" + "script>"
       return result
     },
   },
