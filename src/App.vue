@@ -138,6 +138,8 @@
               label="SampleVue.js"
               :value="inputVueCode"
             ></v-textarea>
+            <p>Note:</p>
+            <p>* api : window.api = require('axios');</p>
           </v-content>
         </v-flex>
       </v-layout>
@@ -602,7 +604,7 @@ export default {
       for (var i = 0; i < this.inputFields.length; i++) {
         const column = this.inputFields[i].name;
         const seq = i + 1;
-        result += "\t<span>" + seq + ". " + column + " : { column_" + seq + " }</span>\n";
+        result += "\t<span>" + seq + ". " + column + " : { " + column + " }</span>\n";
       }
       result += "</template>\n";
       return result;
