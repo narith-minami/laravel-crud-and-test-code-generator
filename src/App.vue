@@ -129,6 +129,15 @@
               3. You need to add field "private ${Your Service Class} on Your
               Test Class"
             </p>
+            <h3>For Vue.js Code (Sample)</h2>
+            <p>This is sample front side code for confirm your API.</p>
+            <v-textarea
+              box
+              auto-grow
+              name="input-7-4"
+              label="SampleVue.js"
+              :value="inputVueCode"
+            ></v-textarea>
           </v-content>
         </v-flex>
       </v-layout>
@@ -575,7 +584,84 @@ export default {
         return "Please input Columns fields.";
       }
       return "";
-    }
+    },
+    generateVueTemplate: function() {
+      let result = "<template>\n";
+      if (this.radios === 'multi') {
+        result += '\t<div v-for="(data, index) in list">\n';
+        result += '\t<p>[ Record.{index} ]</p>\n';
+        for (var i = 0; i < thi.inputFields.length; i++) {
+          const column = thi.inputFields[i].name;
+          const seq = i + 1;
+          result += "\t\t<span>" + seq + ". " + column + " : { data.column_" + seq + " }</span>\n";
+        }
+        result += "\t</div>\n";
+        result += "</template>\n";
+        return result;
+      }
+      for (var i = 0; i < thi.inputFields.length; i++) {
+        const column = thi.inputFields[i].name;
+        const seq = i + 1;
+        result += "\t<span>" + seq + ". " + column + " : { column_" + seq + " }</span>\n";
+      }
+      result += "</template>\n";
+      return result;
+    },
+    fSnakeToCamel: function(snakeStr) {
+      return snakeStr.replace(/_./g,
+          function(s) {
+              return s.charAt(1).toUpperCase();
+          }
+      );
+    },
+    fCamelToSnake: function() {
+
+    },
+    generateVueScript: function() {
+      const keyName = this.fSnakeToCamel(this.selectKeyName)
+      let result += "<script>\n"
+      result += "\texport default {\n"
+      result +=        "\t\tcreated() {\n"
+      result +=          "\t\t\tthis.fetch()\n"
+      result +=        "\t\t},\n"
+      result +=        "\t\tdata() {\n"
+      result +=          "\t\t\treturn {\n"
+      result +=            "\t\t\t\tlist: [],\n"
+      for (var i = 0; i < this.inputFields.length; i++) {
+        const column = this.inputFields[i].name
+        result += "\t\t\t\t"+this.fSnakeToCamel(column)+": null,\n"
+      }
+      result +=          "\t\t\t}\n"
+      result +=        "\t\t},\n"
+      result +=        "\t\tprops: ['" + keyName + "'],\n"
+      result +=        "\t\tmethods: {\n"
+      result +=          "\t\t\tfetch: function() {\n"
+      result +=          "\t\t\t\tapi.get('/api/{**Your Domain**}/' + this." +keyName+ ").then(rs => {\n"
+      if (this.radios === 'multi') {
+        result += "\t\t\t\t\tthis.list = rs.data.data\n"
+      } else {
+        for (var i = 0; i < this.inputFields.length; i++) {
+          const column = this.inputFields[i].name
+          result += "\t\t\t\t\tthis."+this.fSnakeToCamel(column)+" = rs.data.data."+column+"\n"
+        }
+      }
+      result +=          "\t\t\t\t})\n"
+      result +=          "\t\t\t},\n"
+      result +=          "\t\t\tinsert: function() {\n"
+      result += "\t\t\t\tconst data = {\n"
+      for (var i = 0; i < this.inputFields.length; i++) {
+        const column = this.inputFields[i].name
+        const isLast = (i === this.inputFields.length-1)
+        result += "\t\t\t\t\t"+column+": this."+this.fSnakeToCamel(column)+ (isLast?"\n":",\n")
+      }
+      result += "\t\t\t\t}\n"
+      result +=          "\t\t\t\tapi.post('/api/{**Your Domain**}, data).then(rs => {\n"
+      result +=          "\t\t\t}\n"
+      result +=        "\t\t}\n"
+      result +=      "\t}\n"
+      result += "</script>"
+      return result
+    },
   },
   computed: {
     inputServiceCode: function() {
@@ -610,6 +696,17 @@ export default {
       result += this.generateGetTest();
       result += "\n";
       result += this.generateUpdateTest();
+      return result;
+    },
+    inputVueCode: function() {
+      const error = this.validateInputs();
+      if (error !== "") {
+        return error;
+      }
+      let result = "";
+      result += this.generateVueTemplate();
+      result += "\n";
+      result += this.generateVueScript();
       return result;
     }
   },
