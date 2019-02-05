@@ -1,6 +1,5 @@
 <template>
   <v-app id="inspire">
-    <v-navigation-drawer fixed v-model="drawer" app></v-navigation-drawer>
     <v-toolbar color="indigo" dark fixed app>
       <!--
         <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
