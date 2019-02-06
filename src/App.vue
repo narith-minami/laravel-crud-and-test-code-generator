@@ -606,7 +606,7 @@ export default {
       for (var i = 0; i < this.inputFields.length; i++) {
         const column = this.inputFields[i].name;
         const seq = i + 1;
-        result += "\t<span>" + seq + ". " + column + " : { " + column + " }</span>\n";
+        result += "\t<span>" + seq + ". " + column + " : { " + this.fSnakeToCamel(column) + " }</span>\n";
       }
       result += "</div>\n";
       result += "</template>\n";
