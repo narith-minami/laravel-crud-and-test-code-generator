@@ -592,7 +592,7 @@ export default {
       result += "<div>\n";
       if (this.radios === 'multi') {
         result += '\t<div v-for="(data, index) in list">\n';
-        result += '\t<p>[ Record.{index} ]</p>\n';
+        result += '\t<p>[ Record.{{ index }} ]</p>\n';
         for (var i = 0; i < this.inputFields.length; i++) {
           const column = this.inputFields[i].name;
           const seq = i + 1;
