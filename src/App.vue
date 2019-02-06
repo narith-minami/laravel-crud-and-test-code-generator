@@ -596,7 +596,7 @@ export default {
         for (var i = 0; i < this.inputFields.length; i++) {
           const column = this.inputFields[i].name;
           const seq = i + 1;
-          result += "\t\t<span>" + seq + ". " + column + " : { data." + column + " }</span>\n";
+          result += "\t\t<span>" + seq + ". " + column + " : {{ data." + column + " }}</span>\n";
         }
         result += "\t</div>\n";
         result += "</div>\n";
