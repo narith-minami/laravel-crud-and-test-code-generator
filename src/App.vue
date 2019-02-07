@@ -129,6 +129,7 @@
               3. You need to add field "private ${Your Service Class} on Your
               Test Class"
             </p>
+
             <h3>For Vue.js Code (Sample)</h3>
             <p>This is sample front side code for confirm your API.</p>
             <v-textarea
@@ -140,6 +141,33 @@
             ></v-textarea>
             <p>Note:</p>
             <p>* api : window.api = require('axios');</p>
+
+            <h3>Routing (API)</h3>
+            <p>You need to add domein to "routes/api.php"</p>
+            <v-textarea
+              box
+              auto-grow
+              name="input-7-4"
+              label="api.php"
+              :value="inputRouteCode"
+            ></v-textarea>
+
+            <h3>View file</h3>
+            <p>You need to add layout file to "resources/view" directory.</p>
+            <v-textarea
+              box
+              auto-grow
+              name="input-7-4"
+              label="sample.blade.php"
+              :value="inputBladeCode"
+            ></v-textarea>
+
+            <h3>Remaing Work</h3>
+            <ul>
+              <li>1. Create application js</li>
+              <li>2. Add components to webpack.mix.js</li>
+              <li>3. Command: npm run dev</li>
+            </ul>
           </v-content>
         </v-flex>
       </v-layout>
@@ -150,7 +178,7 @@
           target="_blank"
           class="white--text text-xs-center"
           src="https://twitter.com/NARI_Creator"
-          >&copy;NARI TECH</a
+          > &copy;NARI TECH</a
         ></span
       >
     </v-footer>
@@ -624,6 +652,7 @@ export default {
     },
     generateVueScript: function() {
       const keyName = this.fSnakeToCamel(this.selectKeyName)
+      const model = this.modelName.toLowerCase();
       let result = "<script>\n"
       result += "\texport default {\n"
       result +=        "\t\tcreated() {\n"
@@ -641,7 +670,7 @@ export default {
       result +=        "\t\tprops: ['" + keyName + "'],\n"
       result +=        "\t\tmethods: {\n"
       result +=          "\t\t\tfetch: function() {\n"
-      result +=          "\t\t\t\tapi.get('/api/{**Your Domain**}/' + this." +keyName+ ").then(rs => {\n"
+      result +=          "\t\t\t\tapi.get('/api/"+model+"/' + this." +keyName+ ").then(rs => {\n"
       if (this.radios === 'multi') {
         result += "\t\t\t\t\tthis.list = rs.data.data\n"
       } else {
@@ -660,7 +689,7 @@ export default {
         result += "\t\t\t\t\t"+column+": this."+this.fSnakeToCamel(column)+ (isLast?"\n":",\n")
       }
       result += "\t\t\t\t}\n"
-      result +=          "\t\t\t\tapi.post('/api/{**Your Domain**}', data).then(rs => {\n"
+      result +=          "\t\t\t\tapi.post('/api/"+model+"/create', data).then(rs => {\n"
       result += "\t\t\t\t})\n"
       result +=          "\t\t\t}\n"
       result +=        "\t\t}\n"
@@ -668,6 +697,30 @@ export default {
       result += "</" + "script>"
       return result
     },
+    generateRouting: function() {
+      const keyName = this.fSnakeToCamel(this.selectKeyName)
+      let result = "";
+      const prefix = "Route::middleware('api')->";
+      const lowModelStr = this.modelName.toLowerCase();
+      // get
+      result = prefix + "get('/" + lowModelStr + "/{"+keyName+"}', '" + this.modelName + "Controller@get"+this.modelName+"');\n"
+      // insert
+      result = prefix + "post('/" + lowModelStr + "/create', '" + this.modelName + "Controller@create"+this.modelName+"');\n"
+      return result
+    },
+    generateBlade: function() {
+      const key = this.fSnakeToCamel(this.selectKeyName)
+      let result = "";
+      const model = this.modelName.toLowerCase();
+      result += "@extends('layout.default')\n"
+      result += "\n"
+      result += "@section('content')\n"
+      result += "<"+model+" :"+key+"=“{{ $"+key+" }}”></post>\n"
+      result += "\n"
+      result += "<!—- *TODO* <script src=“/js/app.js”></script> -->\n"
+      result += "@endsection"
+      return result
+    }
   },
   computed: {
     inputServiceCode: function() {
@@ -713,6 +766,24 @@ export default {
       result += this.generateVueTemplate();
       result += "\n";
       result += this.generateVueScript();
+      return result;
+    },
+    inputRouteCode: function() {
+      const error = this.validateInputs();
+      if (error !== "") {
+        return error;
+      }
+      let result = "";
+      result += this.generateRouting();
+      return result;
+    },
+    inputBladeCode: function() {
+      const error = this.validateInputs();
+      if (error !== "") {
+        return error;
+      }
+      let result = "";
+      result += this.generateBlade();
       return result;
     }
   },
