@@ -717,7 +717,7 @@ export default {
       result += "@section('content')\n"
       result += "<"+model+" :"+key+"=“{{ $"+key+" }}”></post>\n"
       result += "\n"
-      result += "<!—- *TODO* <script src=“/js/app.js”></script> -->\n"
+      result += '<!—- *TODO* You add application js -->\n'
       result += "@endsection"
       return result
     }
