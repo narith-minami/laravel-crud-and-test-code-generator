@@ -162,11 +162,11 @@
               :value="inputBladeCode"
             ></v-textarea>
 
-            <h3>Remaing Work</h3>
+            <h3>Remain Work</h3>
             <ul>
-              <li>1. Create application js</li>
-              <li>2. Add components to webpack.mix.js</li>
-              <li>3. Command: npm run dev</li>
+              <li>Create or Edit application js</li>
+              <li>Add components to webpack.mix.js</li>
+              <li>Command: npm run dev</li>
             </ul>
           </v-content>
         </v-flex>
@@ -636,6 +636,11 @@ export default {
         const seq = i + 1;
         result += "\t<span>" + seq + ". " + column + " : {{ " + this.fSnakeToCamel(column) + " }}</span>\n";
       }
+      for (var i = 0; i < this.inputFields.length; i++) {
+        const column = this.inputFields[i].name;
+        const col = this.fSnakeToCamel(column)
+        result += '\t<input type="text" v-model="'+col+'" :value="'+col+'">\n'
+      }
       result += "</div>\n";
       result += "</template>\n";
       return result;
@@ -703,9 +708,9 @@ export default {
       const prefix = "Route::middleware('api')->";
       const lowModelStr = this.modelName.toLowerCase();
       // get
-      result = prefix + "get('/" + lowModelStr + "/{"+keyName+"}', '" + this.modelName + "Controller@get"+this.modelName+"');\n"
+      result += prefix + "get('/" + lowModelStr + "/{"+keyName+"}', '" + this.modelName + "Controller@get"+this.modelName+"');\n"
       // insert
-      result = prefix + "post('/" + lowModelStr + "/create', '" + this.modelName + "Controller@create"+this.modelName+"');\n"
+      result += prefix + "post('/" + lowModelStr + "/create', '" + this.modelName + "Controller@create"+this.modelName+"');\n"
       return result
     },
     generateBlade: function() {
