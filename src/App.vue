@@ -836,7 +836,8 @@ export default {
       if (error !== "") {
         return error;
       }
-      result += "private $" + this.serviceName() + "Service;\n";
+      let result = "private $" + this.serviceName() + "Service;\n";
+      result += "\n";
       result += this.generateControllerConstructor();
       result += "\n";
       result += this.generateControllerCreateMethod();
