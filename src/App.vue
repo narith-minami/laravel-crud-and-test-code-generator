@@ -1,202 +1,110 @@
 <template>
-  <v-app id="inspire">
-    <v-toolbar color="indigo" dark fixed app>
-      <!--
+	<v-app id="inspire">
+		<v-toolbar color="indigo" dark fixed app>
+			<!--
         <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
       -->
-      <v-toolbar-title>Laravel CRUD & TestCase Generator</v-toolbar-title>
-    </v-toolbar>
-
-    <v-container grid-list-md>
-      <v-layout justify-space-between row fill-height>
-        <v-flex xs4>
-          <v-content>
-            <v-form>
-              <v-text-field
-                label="Model Name (ex.Post)"
-                type="text"
-                :success="modelName !== ''"
-                v-model="modelName"
-              ></v-text-field>
-              <v-text-field
-                label="Key Column (for update query)"
-                type="text"
-                :success="updateKeyName !== ''"
-                v-model="updateKeyName"
-              ></v-text-field>
-              <v-text-field
-                label="Key Column (for select query)"
-                type="text"
-                :success="selectKeyName !== ''"
-                v-model="selectKeyName"
-              ></v-text-field>
-              <v-container fluid>
-                <p>{{ radios || 'null' }}</p>
-                <v-radio-group v-model="radios" :mandatory="false">
-                  <v-radio label="Single Record (1:1)" value="single"></v-radio>
-                  <v-radio label="Multi Records (1:n)" value="multi"></v-radio>
-                </v-radio-group>
-              </v-container>
-              <v-layout
-                v-if="0 < inputFields.length"
-                v-for="(field, index) in inputFields"
-                :key="index"
-              >
-                <v-text-field
-                  :readonly="true"
-                  :disabled="true"
-                  class="pr-2"
-                  :label="'No.' + (index + 1).toString()"
-                  type="text"
-                  :value="field.name"
-                ></v-text-field>
-                <v-select
-                  :readonly="true"
-                  :disabled="true"
-                  label="Type"
-                  solo
-                  :items="items"
-                  v-model="field.type"
-                ></v-select>
-              </v-layout>
-              <v-layout>
-                <v-text-field
-                  id="input_column_name"
-                  class="pr-2"
-                  label="Column Name"
-                  type="text"
-                  v-model="inputName"
-                ></v-text-field>
-                <v-select
-                  label="Type"
-                  solo
-                  :items="items"
-                  v-model="selectType"
-                ></v-select>
-                <v-btn outlline round class="red" @click="addColumn();"
-                  >add</v-btn
-                >
-              </v-layout>
-
-              <v-textarea
-                box
-                auto-grow
-                name="input-7-4"
-                label="Migration Fileds"
-                v-model="textInput"
-              ></v-textarea>
-              <v-btn outlline round class="blue" @click="addColumnsFromText();"
-                >Check</v-btn
-              >
-            </v-form>
-          </v-content>
-        </v-flex>
-        <v-flex xs8>
-          <v-content>
-            <h2>Result (Source Code)</h2>
-            <v-textarea id="controller"
-              box
-              auto-grow
-              name="input-7-4"
-              label="Controller"
-              :value="inputControllerCode"
-            ></v-textarea>
-            <v-btn @click="copy('controller')" outline color="indigo">Copy Code</v-btn>
-            <!-- <p>Note:</p> -->
-            <v-textarea id="service"
-              box
-              auto-grow
-              name="input-7-4"
-              label="Service"
-              :value="inputServiceCode"
-            ></v-textarea>
-            <v-btn @click="copy('service')" outline color="indigo">Copy Code</v-btn>
-            <p>Note:</p>
-            <p>1. You need to add "use \App\{{ modelName }};" on Your Class</p>
-            <p>2. You need to add $fillabel to {{ modelName }}.php</p>
-            <p>-「{{ fillable }}」</p>
-            <v-textarea id="test"
-              box
-              auto-grow
-              name="input-7-4"
-              label="TestCase"
-              :value="inputTestCode"
-            ></v-textarea>
-            <v-btn @click="copy('test')" outline color="indigo">Copy Code</v-btn>
-            <p>Preparation:</p>
-            <p>
-              - You can create Test Class by 「php artisan make:test
-              {{ modelName }}Test --unit」 command
-            </p>
-            <p>Note:</p>
-            <p>
-              1. You need to add "use \App\{{ modelName }};" on Your Test Class
-            </p>
-            <p>
-              2. You need to add "use \App\Services\{Your Service Class} on Your
-              Test Class"
-            </p>
-            <p>
-              3. You need to add field "private ${Your Service Class} on Your
-              Test Class"
-            </p>
-
-            <h3>For Vue.js Code (Sample)</h3>
-            <p>This is sample front side code for confirm your API.</p>
-            <v-textarea id="vue"
-              box
-              auto-grow
-              name="input-7-4"
-              label="SampleVue.js"
-              :value="inputVueCode"
-            ></v-textarea>
-            <v-btn @click="copy('vue')" outline color="indigo">Copy Code</v-btn>
-            <p>Note:</p>
-            <p>* api : window.api = require('axios');</p>
-
-            <h3>Routing (API)</h3>
-            <p>You need to add domein to "routes/api.php"</p>
-            <v-textarea id="api"
-              box
-              auto-grow
-              name="input-7-4"
-              label="api.php"
-              :value="inputRouteCode"
-            ></v-textarea>
-            <v-btn @click="copy('api')" outline color="indigo">Copy Code</v-btn>
-
-            <h3>View file</h3>
-            <p>You need to add layout file to "resources/view" directory.</p>
-            <v-textarea
-              box
-              auto-grow
-              name="input-7-4"
-              label="sample.blade.php"
-              :value="inputBladeCode"
-            ></v-textarea>
-
-            <h3>Remain Work</h3>
-            <ul>
-              <li>Create or Edit application js</li>
-              <li>Add components to webpack.mix.js</li>
-              <li>Command: npm run dev</li>
-            </ul>
-          </v-content>
-        </v-flex>
-      </v-layout>
-    </v-container>
-    <v-footer color="indigo" app inset>
-      <span class="white--text text-xs-center"
-        ><a
-          target="_blank"
-          class="white--text text-xs-center"
-          src="https://twitter.com/NARI_Creator"
-          > &copy;NARI TECH</a
-        ></span
-      >
-    </v-footer>
-  </v-app>
+			<v-toolbar-title>Laravel CRUD & TestCase Generator</v-toolbar-title>
+		</v-toolbar>
+		<v-container grid-list-md>
+			<v-layout justify-space-between row fill-height>
+				<v-flex xs4>
+					<v-content>
+						<v-form>
+							<v-text-field label="Model Name (ex.Post)" type="text" :success="modelName !== ''" v-model="modelName" ></v-text-field>
+							<v-text-field label="Key Column (for update query)" type="text" :success="updateKeyName !== ''" v-model="updateKeyName" ></v-text-field>
+							<v-text-field label="Key Column (for select query)" type="text" :success="selectKeyName !== ''" v-model="selectKeyName" ></v-text-field>
+							<v-container fluid>
+								<p>{{ radios || 'null' }}</p>
+								<v-radio-group v-model="radios" :mandatory="false">
+									<v-radio label="Single Record (1:1)" value="single"></v-radio>
+									<v-radio label="Multi Records (1:n)" value="multi"></v-radio>
+								</v-radio-group>
+							</v-container>
+							<v-layout v-if="0 < inputFields.length" v-for="(field, index) in inputFields" :key="index" >
+								<v-text-field :readonly="true" :disabled="true" class="pr-2" :label="'No.' + (index + 1).toString()" type="text" :value="field.name" ></v-text-field>
+								<v-select :readonly="true" :disabled="true" label="Type" solo :items="items" v-model="field.type" ></v-select>
+							</v-layout>
+							<v-layout>
+								<v-text-field id="input_column_name" class="pr-2" label="Column Name" type="text" v-model="inputName" ></v-text-field>
+								<v-select label="Type" solo :items="items" v-model="selectType" ></v-select>
+								<v-btn outlline round class="red" @click="addColumn();" >add</v-btn >
+							</v-layout>
+							<v-textarea box auto-grow name="input-7-4" label="Migration Fileds" v-model="textInput" ></v-textarea>
+							<v-btn outlline round class="blue" @click="addColumnsFromText();" >Check</v-btn >
+						</v-form>
+					</v-content>
+				</v-flex>
+				<v-flex xs8>
+					<v-content>
+						<v-container>
+							<h2>Result (Source Code)</h2>
+							<v-textarea id="controller" box auto-grow name="input-7-4" label="Controller" :value="inputControllerCode" ></v-textarea>
+							<v-btn class="copy-btn" @click="copy('controller')" outline color="indigo">Copy Code</v-btn>
+							<!-- <p>Note:</p> -->
+						</v-container>
+						<v-container>
+							<v-textarea id="service" box auto-grow name="input-7-4" label="Service" :value="inputServiceCode" ></v-textarea>
+							<v-btn class="copy-btn" @click="copy('service')" outline color="indigo">Copy Code</v-btn>
+							<p>Note:</p>
+							<p>1. You need to add "use \App\{{ modelName }};" on Your Class</p>
+							<p>2. You need to add $fillabel to {{ modelName }}.php</p>
+							<p>-「{{ fillable }}」</p>
+						</v-container>
+						<v-container>
+							<v-textarea id="test" box auto-grow name="input-7-4" label="TestCase" :value="inputTestCode" ></v-textarea>
+							<v-btn class="copy-btn" @click="copy('test')" outline color="indigo">Copy Code</v-btn>
+							<p>Preparation:</p>
+							<p>- You can create Test Class by 「php artisan make:test {{ modelName }}Test --unit」 command </p>
+							<p>Note:</p>
+							<p>1. You need to add "use \App\{{ modelName }};" on Your Test Class </p>
+							<p>2. You need to add "use \App\Services\{Your Service Class} on Your
+              Test Class" </p>
+							<p>3. You need to add field "private ${Your Service Class} on Your
+              Test Class" </p>
+						</v-container>
+						<v-container>
+							<h3>For Vue.js Code (Sample)</h3>
+							<p>This is sample front side code for confirm your API.</p>
+							<v-textarea id="vue" box auto-grow name="input-7-4" label="SampleVue.js" :value="inputVueCode" ></v-textarea>
+							<v-btn class="copy-btn" @click="copy('vue')" outline color="indigo">Copy Code</v-btn>
+							<p>Note:</p>
+							<p>* api : window.api = require('axios');</p>
+						</v-container>
+						<v-container>
+							<h3>Routing (API)</h3>
+							<p>You need to add domein to "routes/api.php"</p>
+							<v-textarea id="api" box auto-grow name="input-7-4" label="api.php" :value="inputRouteCode" ></v-textarea>
+							<v-btn class="copy-btn" @click="copy('api')" outline color="indigo">Copy Code</v-btn>
+						</v-container>
+						<v-container>
+							<h3>View file</h3>
+							<p>You need to add layout file to "resources/view" directory.</p>
+							<v-textarea box auto-grow name="input-7-4" label="sample.blade.php" :value="inputBladeCode" ></v-textarea>
+							<h3>Remain Work</h3>
+							<ul>
+								<li>Create or Edit application js</li>
+								<li>Add components to webpack.mix.js</li>
+								<li>Command: npm run dev</li>
+							</ul>
+						</v-container>
+					</v-content>
+				</v-flex>
+			</v-layout>
+		</v-container>
+		<v-footer color="indigo" app inset>
+			<span class="white--text text-xs-center" >
+				<a target="_blank" class="white--text text-xs-center" src="https://twitter.com/NARI_Creator" >&copy;NARI TECH</a >
+			</span >
+		</v-footer>
+	</v-app>
 </template>
+
+<style scoped>
+.copy-btn{
+  padding-bottom: 30px;
+}
+</style>
 
 <script>
 export default {
@@ -233,7 +141,7 @@ export default {
       try {
         var successful = document.execCommand('copy');
         var msg = successful ? 'successful' : 'unsuccessful';
-        alert('Code was copied!!');
+        // alert('Code was copied!!');
       } catch (err) {
         alert('Oops, unable to copy');
       }
