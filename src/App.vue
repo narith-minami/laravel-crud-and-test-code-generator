@@ -825,12 +825,12 @@ export default {
       result += '<!—- *TODO* You add application js -->\n'
       result += "@endsection"
       return result
+    },
+    serviceName: function() {
+      return 2 < this.modelName.length ? this.modelName.charAt(0).toLowerCase() + this.modelName.slice(1) : ''
     }
   },
   computed: {
-    serviceName: function() {
-      return 2 < this.modelName.length ? this.modelName.charAt(0).toLowerCase() + this.modelName.slice(1) : ''
-    },
     inputControllerCode: function() {
       const error = this.validateInputs();
       if (error !== "") {
