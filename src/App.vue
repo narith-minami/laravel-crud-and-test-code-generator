@@ -216,7 +216,6 @@ export default {
     inputFields: [],
     textInput: "",
     fillable: "",
-    serviceName: 2 < this.modelName.length ? this.modelName.charAt(0).toLowerCase() + this.modelName.slice(1) : '';
     dummy: [
       { name: "title", type: "integer" },
       { name: "body", type: "string" }
@@ -294,7 +293,7 @@ export default {
         result += "\t$this->middleware('auth');" + "\n";
         result += "\t// $user_id = \Auth::user()->id; // if you need login userId" + "\n";
         result += "\t$params = request('list_param'); // TODO" + "\n";
-        result += "\t$this->" + this.serviceName + "Service->create" + this.modelName + "s($params)" + "\n";
+        result += "\t$this->" + this.serviceName() + "Service->create" + this.modelName + "s($params)" + "\n";
         result += "\treturn ['code' => '200']; // TODO" + "\n";
         result += "}" + "\n";
         return result;
@@ -311,7 +310,7 @@ export default {
         const column = data[i]["name"]
         result += "\t$" + column + " = request('" + this.fSnakeToCamel(column) + "');" + "\n";
       }
-      result += "\t$this->" + this.serviceName + "Service->create" + this.modelName + "(" + args + ")" + "\n";
+      result += "\t$this->" + this.serviceName() + "Service->create" + this.modelName + "(" + args + ")" + "\n";
       result += "\treturn ['code' => '200']; // TODO" + "\n";
       result += "}" + "\n";
       return result;
@@ -327,7 +326,7 @@ export default {
         result += "\t// $user_id = \Auth::user()->id; // if you need login userId" + "\n";
         result += "\t$" + column + " = request('" + this.fSnakeToCamel(this.selectKeyName) + "');" + "\n";
         result += "\t$params = request('list_param'); // TODO" + "\n";
-        result += "\t$this->" + this.serviceName + "Service->update" + this.modelName + "s($" + this.updateKeyName + ", $params)" + "\n";
+        result += "\t$this->" + this.serviceName() + "Service->update" + this.modelName + "s($" + this.updateKeyName + ", $params)" + "\n";
         result += "\treturn ['code' => '200']; // TODO" + "\n";
         result += "}" + "\n";
         return result;
@@ -345,7 +344,7 @@ export default {
         const column = data[i]["name"]
         result += "\t$" + column + " = request('" + this.fSnakeToCamel(column) + "');" + "\n";
       }
-      result += "\t$this->" + this.serviceName + "Service->update" + this.modelName + "(" + args + ")" + "\n";
+      result += "\t$this->" + this.serviceName() + "Service->update" + this.modelName + "(" + args + ")" + "\n";
       result += "\treturn ['code' => '200']; // TODO" + "\n";
       result += "}" + "\n";
       return result;
@@ -355,13 +354,13 @@ export default {
       if (this.radios === 'multi') {
         result += "public function get" + this.modelName + "s($" + this.fSnakeToCamel(this.selectKeyName) + ")\n";
         result += "{" + "\n";
-        result += "\t$data = $this->" + this.serviceName + "Service->get" + this.modelName + "s(" + this.fSnakeToCamel(this.selectKeyName) + ")" + "\n";
+        result += "\t$data = $this->" + this.serviceName() + "Service->get" + this.modelName + "s(" + this.fSnakeToCamel(this.selectKeyName) + ")" + "\n";
         result += "\treturn ['code' => '200', 'data' => $data]; // TODO" + "\n";
         result += "}" + "\n";
       }
       result += "public function get" + this.modelName + "($" + this.fSnakeToCamel(this.selectKeyName) + ")\n";
       result += "{" + "\n";
-      result += "\t$data = $this->" + this.serviceName + "Service->get" + this.modelName + "(" + this.fSnakeToCamel(this.selectKeyName) + ")" + "\n";
+      result += "\t$data = $this->" + this.serviceName() + "Service->get" + this.modelName + "(" + this.fSnakeToCamel(this.selectKeyName) + ")" + "\n";
       result += "\treturn ['code' => '200', 'data' => $data]; // TODO" + "\n";
       result += "}" + "\n";
       return result;
@@ -829,6 +828,9 @@ export default {
     }
   },
   computed: {
+    serviceName: function() {
+      return 2 < this.modelName.length ? this.modelName.charAt(0).toLowerCase() + this.modelName.slice(1) : ''
+    },
     inputControllerCode: function() {
       const error = this.validateInputs();
       if (error !== "") {
