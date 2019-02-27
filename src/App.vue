@@ -61,7 +61,7 @@
               </v-layout>
               <v-layout>
                 <v-text-field
-                  ref="input_column_name"
+                  id="input_column_name"
                   class="pr-2"
                   label="Column Name"
                   type="text"
@@ -94,35 +94,35 @@
         <v-flex xs8>
           <v-content>
             <h2>Result (Source Code)</h2>
-            <v-textarea ref="controller"
+            <v-textarea id="controller"
               box
               auto-grow
               name="input-7-4"
               label="Controller"
               :value="inputControllerCode"
             ></v-textarea>
-            <v-btn @click="copy(controller)" outline color="indigo">Outline Button</v-btn>
-            <p>Note:</p>
-            <v-textarea ref="service"
+            <v-btn @click="copy('controller')" outline color="indigo">Copy Code</v-btn>
+            <!-- <p>Note:</p> -->
+            <v-textarea id="service"
               box
               auto-grow
               name="input-7-4"
               label="Service"
               :value="inputServiceCode"
             ></v-textarea>
-            <v-btn @click="copy(service)" outline color="indigo">Outline Button</v-btn>
+            <v-btn @click="copy('service')" outline color="indigo">Copy Code</v-btn>
             <p>Note:</p>
             <p>1. You need to add "use \App\{{ modelName }};" on Your Class</p>
             <p>2. You need to add $fillabel to {{ modelName }}.php</p>
             <p>-「{{ fillable }}」</p>
-            <v-textarea ref="test"
+            <v-textarea id="test"
               box
               auto-grow
               name="input-7-4"
               label="TestCase"
               :value="inputTestCode"
             ></v-textarea>
-            <v-btn @click="copy(test)" outline color="indigo">Outline Button</v-btn>
+            <v-btn @click="copy('test')" outline color="indigo">Copy Code</v-btn>
             <p>Preparation:</p>
             <p>
               - You can create Test Class by 「php artisan make:test
@@ -143,27 +143,27 @@
 
             <h3>For Vue.js Code (Sample)</h3>
             <p>This is sample front side code for confirm your API.</p>
-            <v-textarea ref="vue"
+            <v-textarea id="vue"
               box
               auto-grow
               name="input-7-4"
               label="SampleVue.js"
               :value="inputVueCode"
             ></v-textarea>
-            <v-btn @click="copy(vue)" outline color="indigo">Outline Button</v-btn>
+            <v-btn @click="copy('vue')" outline color="indigo">Copy Code</v-btn>
             <p>Note:</p>
             <p>* api : window.api = require('axios');</p>
 
             <h3>Routing (API)</h3>
             <p>You need to add domein to "routes/api.php"</p>
-            <v-textarea ref="api"
+            <v-textarea id="api"
               box
               auto-grow
               name="input-7-4"
               label="api.php"
               :value="inputRouteCode"
             ></v-textarea>
-            <v-btn @click="copy(api)" outline color="indigo">Outline Button</v-btn>
+            <v-btn @click="copy('api')" outline color="indigo">Copy Code</v-btn>
 
             <h3>View file</h3>
             <p>You need to add layout file to "resources/view" directory.</p>
@@ -228,9 +228,16 @@ export default {
   }),
   methods: {
     copy: function(target) {
-      this.$refs[target].select()
-			document.execCommand('Copy')
-			alert('Copied!!')
+      let copyTarget = document.querySelector('#' + target)
+      copyTarget.select()
+      try {
+        var successful = document.execCommand('copy');
+        var msg = successful ? 'successful' : 'unsuccessful';
+        alert('Code was copied!!');
+      } catch (err) {
+        alert('Oops, unable to copy');
+      }
+      window.getSelection().removeAllRanges()
     },
     addColumnsFromText: function() {
       if (this.textInput === "") {
