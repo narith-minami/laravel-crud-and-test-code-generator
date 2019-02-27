@@ -324,7 +324,7 @@ export default {
         result += "{" + "\n";
         result += "\t$this->middleware('auth');" + "\n";
         result += "\t// $user_id = \Auth::user()->id; // if you need login userId" + "\n";
-        result += "\t$" + column + " = request('" + this.fSnakeToCamel(this.selectKeyName) + "');" + "\n";
+        result += "\t$" + this.updateKeyName + " = request('" + this.fSnakeToCamel(this.updateKeyName) + "');" + "\n";
         result += "\t$params = request('list_param'); // TODO" + "\n";
         result += "\t$this->" + this.serviceName() + "Service->update" + this.modelName + "s($" + this.updateKeyName + ", $params)" + "\n";
         result += "\treturn ['code' => '200']; // TODO" + "\n";
@@ -836,7 +836,7 @@ export default {
       if (error !== "") {
         return error;
       }
-      let result = "";
+      result += "private $" + this.serviceName() + "Service;\n";
       result += this.generateControllerConstructor();
       result += "\n";
       result += this.generateControllerCreateMethod();
