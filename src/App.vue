@@ -102,7 +102,7 @@
 
 <style scoped>
 .copy-btn{
-  padding-bottom: 30px;
+  margin-bottom: 16px;
 }
 </style>
 
@@ -282,7 +282,7 @@ export default {
         result += "\t$data = $this->" + this.serviceName() + "Service->get" + this.modelName + "s($" + this.fSnakeToCamel(this.selectKeyName) + ")" + "\n";
         result += "\treturn ['code' => '200', 'data' => $data]; // TODO" + "\n";
         result += "}" + "\n";
-        return
+        return result
       }
       result += "public function get" + this.modelName + "($" + this.fSnakeToCamel(this.selectKeyName) + ")\n";
       result += "{" + "\n";
