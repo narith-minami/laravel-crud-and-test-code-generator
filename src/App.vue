@@ -201,11 +201,11 @@ export default {
     generateControllerConstructor: function() {
       const sName =
         this.modelName.charAt(0).toLowerCase() + this.modelName.slice(1);
-      let result = "public function __construct(" + this.modelName + "Service $" + sName + "Service)\n";
-      result += "{\n";
-      result += "\t" + "$this->" + sName + "Service = $" + sName + "Service;" + "\n";
-      result += "\t$this->middleware('auth');\n";
-      result += "}\n";
+      let result = "\tpublic function __construct(" + this.modelName + "Service $" + sName + "Service)\n";
+      result += "\t{\n";
+      result += "\t\t" + "$this->" + sName + "Service = $" + sName + "Service;" + "\n";
+      result += "\t\t$this->middleware('auth');\n";
+      result += "\t}\n";
       return result;
     },
     generateControllerCreateMethod: function() {
@@ -213,31 +213,31 @@ export default {
       let args = "";
       const data = this.inputFields;
       if (this.radios === 'multi') {
-        result += "public function create" + this.modelName + "s()" + "\n";
-        result += "{" + "\n";
-        result += "\t$this->middleware('auth');" + "\n";
-        result += "\t// $user_id = \Auth::user()->id; // if you need login userId" + "\n";
-        result += "\t$params = request('list_param'); // TODO" + "\n";
-        result += "\t$this->" + this.serviceName() + "Service->create" + this.modelName + "s($params)" + "\n";
-        result += "\treturn ['code' => '200']; // TODO" + "\n";
-        result += "}" + "\n";
+        result += "\tpublic function create" + this.modelName + "s()" + "\n";
+        result += "\t{" + "\n";
+        result += "\t\t$this->middleware('auth');" + "\n";
+        result += "\t\t// $user_id = \Auth::user()->id; // if you need login userId" + "\n";
+        result += "\t\t$params = request('list_param'); // TODO" + "\n";
+        result += "\t\t$this->" + this.serviceName() + "Service->create" + this.modelName + "s($params);" + "\n";
+        result += "\t\treturn ['code' => '200']; // TODO" + "\n";
+        result += "\t}" + "\n";
         return result;
       }
       for (let i = 0; i < data.length - 1; ++i) {
         args += "$" + data[i]["name"] + ", ";
       }
       args += "$" + data[data.length - 1]["name"];
-      result += "public function create" + this.modelName + "()" + "\n";
-      result += "{" + "\n";
-      result += "\t$this->middleware('auth');" + "\n";
-      result += "\t// $user_id = \Auth::user()->id; // if you need login userId" + "\n";
+      result += "\tpublic function create" + this.modelName + "()" + "\n";
+      result += "\t{" + "\n";
+      result += "\t\t$this->middleware('auth');" + "\n";
+      result += "\t\t// $user_id = \Auth::user()->id; // if you need login userId" + "\n";
       for (let i = 0; i < data.length; ++i) {
         const column = data[i]["name"]
-        result += "\t$" + column + " = request('" + this.fSnakeToCamel(column) + "');" + "\n";
+        result += "\t\t$" + column + " = request('" + this.fSnakeToCamel(column) + "');" + "\n";
       }
-      result += "\t$this->" + this.serviceName() + "Service->create" + this.modelName + "(" + args + ")" + "\n";
-      result += "\treturn ['code' => '200']; // TODO" + "\n";
-      result += "}" + "\n";
+      result += "\t\t$this->" + this.serviceName() + "Service->create" + this.modelName + "(" + args + ");" + "\n";
+      result += "\t\treturn ['code' => '200']; // TODO" + "\n";
+      result += "\t}" + "\n";
       return result;
     },
     generateControllerUpdateMethod: function() {
@@ -245,50 +245,50 @@ export default {
       let args = "$" + this.updateKeyName + ", ";
       const data = this.inputFields;
       if (this.radios === 'multi') {
-        result += "public function update" + this.modelName + "s()" + "\n";
-        result += "{" + "\n";
-        result += "\t$this->middleware('auth');" + "\n";
-        result += "\t// $user_id = \Auth::user()->id; // if you need login userId" + "\n";
-        result += "\t$" + this.updateKeyName + " = request('" + this.fSnakeToCamel(this.updateKeyName) + "');" + "\n";
-        result += "\t$params = request('list_param'); // TODO" + "\n";
-        result += "\t$this->" + this.serviceName() + "Service->update" + this.modelName + "s($" + this.updateKeyName + ", $params)" + "\n";
-        result += "\treturn ['code' => '200']; // TODO" + "\n";
-        result += "}" + "\n";
+        result += "\tpublic function update" + this.modelName + "s()" + "\n";
+        result += "\t{" + "\n";
+        result += "\t\t$this->middleware('auth');" + "\n";
+        result += "\t\t// $user_id = \Auth::user()->id; // if you need login userId" + "\n";
+        result += "\t\t$" + this.updateKeyName + " = request('" + this.fSnakeToCamel(this.updateKeyName) + "');" + "\n";
+        result += "\t\t$params = request('list_param'); // TODO" + "\n";
+        result += "\t\t$this->" + this.serviceName() + "Service->update" + this.modelName + "s($" + this.updateKeyName + ", $params);" + "\n";
+        result += "\t\treturn ['code' => '200']; // TODO" + "\n";
+        result += "\t}" + "\n";
         return result;
       }
       for (let i = 0; i < data.length - 1; ++i) {
         args += "$" + data[i]["name"] + ", ";
       }
       args += "$" + data[data.length - 1]["name"];
-      result += "public function update" + this.modelName + "()" + "\n";
-      result += "{" + "\n";
-      result += "\t$this->middleware('auth');" + "\n";
-      result += "\t// $user_id = \Auth::user()->id; // if you need login userId" + "\n";
-      result += "\t$" + this.updateKeyName + " = request('" + this.fSnakeToCamel(this.updateKeyName) + "');" + "\n";
+      result += "\tpublic function update" + this.modelName + "()" + "\n";
+      result += "\t{" + "\n";
+      result += "\t\t$this->middleware('auth');" + "\n";
+      result += "\t\t// $user_id = \Auth::user()->id; // if you need login userId" + "\n";
+      result += "\t\t$" + this.updateKeyName + " = request('" + this.fSnakeToCamel(this.updateKeyName) + "');" + "\n";
       for (let i = 0; i < data.length; ++i) {
         const column = data[i]["name"]
-        result += "\t$" + column + " = request('" + this.fSnakeToCamel(column) + "');" + "\n";
+        result += "\t\t$" + column + " = request('" + this.fSnakeToCamel(column) + "');" + "\n";
       }
-      result += "\t$this->" + this.serviceName() + "Service->update" + this.modelName + "(" + args + ")" + "\n";
-      result += "\treturn ['code' => '200']; // TODO" + "\n";
-      result += "}" + "\n";
+      result += "\t\t$this->" + this.serviceName() + "Service->update" + this.modelName + "(" + args + ");" + "\n";
+      result += "\t\treturn ['code' => '200']; // TODO" + "\n";
+      result += "\t}" + "\n";
       return result;
     },
     generateControllerGetMethod: function() {
       let result = "";
       if (this.radios === 'multi') {
-        result += "public function get" + this.modelName + "s($" + this.fSnakeToCamel(this.selectKeyName) + ")\n";
-        result += "{" + "\n";
-        result += "\t$data = $this->" + this.serviceName() + "Service->get" + this.modelName + "s($" + this.fSnakeToCamel(this.selectKeyName) + ")" + "\n";
-        result += "\treturn ['code' => '200', 'data' => $data]; // TODO" + "\n";
-        result += "}" + "\n";
+        result += "\tpublic function get" + this.modelName + "s($" + this.fSnakeToCamel(this.selectKeyName) + ")\n";
+        result += "\t{" + "\n";
+        result += "\t\t$data = $this->" + this.serviceName() + "Service->get" + this.modelName + "s($" + this.fSnakeToCamel(this.selectKeyName) + ");" + "\n";
+        result += "\t\treturn ['code' => '200', 'data' => $data]; // TODO" + "\n";
+        result += "\t}" + "\n";
         return result
       }
-      result += "public function get" + this.modelName + "($" + this.fSnakeToCamel(this.selectKeyName) + ")\n";
-      result += "{" + "\n";
-      result += "\t$data = $this->" + this.serviceName() + "Service->get" + this.modelName + "($" + this.fSnakeToCamel(this.selectKeyName) + ")" + "\n";
-      result += "\treturn ['code' => '200', 'data' => $data]; // TODO" + "\n";
-      result += "}" + "\n";
+      result += "\tpublic function get" + this.modelName + "($" + this.fSnakeToCamel(this.selectKeyName) + ")\n";
+      result += "\t{" + "\n";
+      result += "\t\t$data = $this->" + this.serviceName() + "Service->get" + this.modelName + "($" + this.fSnakeToCamel(this.selectKeyName) + ");" + "\n";
+      result += "\t\treturn ['code' => '200', 'data' => $data]; // TODO" + "\n";
+      result += "\t}" + "\n";
       return result;
     },
     generateCreateMethod: function() {
@@ -794,7 +794,7 @@ export default {
       let result = "";
       const sName =
         this.modelName.charAt(0).toLowerCase() + this.modelName.slice(1);
-      result += "private $" + sName + "Service;\n";
+      result += "\tprivate $" + sName + "Service;\n";
       result += "\n";
       result += this.generateTestSetupCode();
       result += "\n";
