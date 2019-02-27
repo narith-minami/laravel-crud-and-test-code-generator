@@ -94,32 +94,35 @@
         <v-flex xs8>
           <v-content>
             <h2>Result (Source Code)</h2>
-            <v-textarea
+            <v-textarea ref="controller"
               box
               auto-grow
               name="input-7-4"
               label="Controller"
               :value="inputControllerCode"
             ></v-textarea>
+            <v-btn @click="copy(controller)" outline color="indigo">Outline Button</v-btn>
             <p>Note:</p>
-            <v-textarea
+            <v-textarea ref="service"
               box
               auto-grow
               name="input-7-4"
               label="Service"
               :value="inputServiceCode"
             ></v-textarea>
+            <v-btn @click="copy(service)" outline color="indigo">Outline Button</v-btn>
             <p>Note:</p>
             <p>1. You need to add "use \App\{{ modelName }};" on Your Class</p>
             <p>2. You need to add $fillabel to {{ modelName }}.php</p>
             <p>-「{{ fillable }}」</p>
-            <v-textarea
+            <v-textarea ref="test"
               box
               auto-grow
               name="input-7-4"
               label="TestCase"
               :value="inputTestCode"
             ></v-textarea>
+            <v-btn @click="copy(test)" outline color="indigo">Outline Button</v-btn>
             <p>Preparation:</p>
             <p>
               - You can create Test Class by 「php artisan make:test
@@ -140,25 +143,27 @@
 
             <h3>For Vue.js Code (Sample)</h3>
             <p>This is sample front side code for confirm your API.</p>
-            <v-textarea
+            <v-textarea ref="vue"
               box
               auto-grow
               name="input-7-4"
               label="SampleVue.js"
               :value="inputVueCode"
             ></v-textarea>
+            <v-btn @click="copy(vue)" outline color="indigo">Outline Button</v-btn>
             <p>Note:</p>
             <p>* api : window.api = require('axios');</p>
 
             <h3>Routing (API)</h3>
             <p>You need to add domein to "routes/api.php"</p>
-            <v-textarea
+            <v-textarea ref="api"
               box
               auto-grow
               name="input-7-4"
               label="api.php"
               :value="inputRouteCode"
             ></v-textarea>
+            <v-btn @click="copy(api)" outline color="indigo">Outline Button</v-btn>
 
             <h3>View file</h3>
             <p>You need to add layout file to "resources/view" directory.</p>
@@ -222,6 +227,11 @@ export default {
     ]
   }),
   methods: {
+    copy: function(target) {
+      this.$refs[target].select()
+			document.execCommand('Copy')
+			alert('Copied!!')
+    },
     addColumnsFromText: function() {
       if (this.textInput === "") {
         return;
@@ -354,13 +364,14 @@ export default {
       if (this.radios === 'multi') {
         result += "public function get" + this.modelName + "s($" + this.fSnakeToCamel(this.selectKeyName) + ")\n";
         result += "{" + "\n";
-        result += "\t$data = $this->" + this.serviceName() + "Service->get" + this.modelName + "s(" + this.fSnakeToCamel(this.selectKeyName) + ")" + "\n";
+        result += "\t$data = $this->" + this.serviceName() + "Service->get" + this.modelName + "s($" + this.fSnakeToCamel(this.selectKeyName) + ")" + "\n";
         result += "\treturn ['code' => '200', 'data' => $data]; // TODO" + "\n";
         result += "}" + "\n";
+        return
       }
       result += "public function get" + this.modelName + "($" + this.fSnakeToCamel(this.selectKeyName) + ")\n";
       result += "{" + "\n";
-      result += "\t$data = $this->" + this.serviceName() + "Service->get" + this.modelName + "(" + this.fSnakeToCamel(this.selectKeyName) + ")" + "\n";
+      result += "\t$data = $this->" + this.serviceName() + "Service->get" + this.modelName + "($" + this.fSnakeToCamel(this.selectKeyName) + ")" + "\n";
       result += "\treturn ['code' => '200', 'data' => $data]; // TODO" + "\n";
       result += "}" + "\n";
       return result;
