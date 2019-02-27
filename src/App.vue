@@ -762,7 +762,7 @@ export default {
       if (error !== "") {
         return error;
       }
-      let result = "private $" + this.serviceName() + "Service;\n";
+      let result = "\tprivate $" + this.serviceName() + "Service;\n";
       result += "\n";
       result += this.generateControllerConstructor();
       result += "\n";
@@ -794,7 +794,7 @@ export default {
       let result = "";
       const sName =
         this.modelName.charAt(0).toLowerCase() + this.modelName.slice(1);
-      result += "\tprivate $" + sName + "Service;\n";
+      result += "private $" + sName + "Service;\n";
       result += "\n";
       result += this.generateTestSetupCode();
       result += "\n";
