@@ -321,6 +321,7 @@ export default {
         result += "\t$model->" + data[i]["name"] + " = $" + data[i]["name"] + ";" + "\n";
       }
       result += "\t$model->save();" + "\n";
+			result += "\treturn $model;" + "\n";
       result += "}" + "\n";
       return result;
     },
@@ -512,7 +513,7 @@ export default {
     generateTestTearDownAfterClassCode: function() {
       const sName =
         this.modelName.charAt(0).toLowerCase() + this.modelName.slice(1);
-      let result = "public function tearDownAfterClass()\n";
+      let result = "public static function tearDownAfterClass()\n";
       result += "{\n";
       result += "\t" + this.modelName + "::where('" + this.selectKeyName + "', 99999)->delete();\n";
       result += "}\n";
